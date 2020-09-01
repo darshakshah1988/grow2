@@ -2,7 +2,7 @@ export const BASE_URL: string = window.location.host === 'https://stagegrow.hero
     ? 'https://stagegrow.herokuapp.com/'
     : window.location.origin
 
-export const STRIPE_PUBLISHABLE_KEY = 'pk_test_51H7mptIVvM8zimDuPVOYQ4TwtQC5xQNj4ETWPU9PJZW7TcEDo6StW4rL7aPaJw8uhTDWAbATLpoP2wyQmWNG0yx900nTnc77V2'
+export const STRIPE_PUBLISHABLE_KEY = ''
 
 export const PUSHER = {
     KEY: 'b3893e4536e003ed0924',
