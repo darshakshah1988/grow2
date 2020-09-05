@@ -145,7 +145,7 @@ export const checkStudentLogin = (req, res, next) => {
 
 export const checkMentorLogin = (req, res, next) => {
   if (!req.isAuthenticated || !req.isAuthenticated() || !req.user.mentor) {
-    return res.redirect('/l/mentor')
+    return res.redirect('/l/member')
   }
   next()
 }

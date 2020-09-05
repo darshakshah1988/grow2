@@ -206,3 +206,54 @@ export const studentUnitProgress = async (unitId, studentId): Promise<UnitProgre
       return res
     })
 }
+
+
+export const inviteMentor = async (payload, adminName) => {
+  const { email } = payload
+  return Mentor.findOne({ where: { email }, include: [Business] }).then(mentor => {
+    if (!mentor) {
+      // Invite New Student
+      const password: string = passwordGenerator.generate(PASSWORD_OPTS)
+      return createStudent({ email, password }).then(mentor => {
+        const token = jwt.sign({
+          sub: mentor.id,
+          email: mentor.email,
+          iss: JWT_ISSUER,
+          userType: 'mentor',
+          aud: 'invite',
+        }, process.env.JWT_SECRET)
+        console.log('http://localhost:5000/invite?token=' + token)
+        console.log('\n\n')
+        const mailData = {
+          token,
+          adminName,
+        }
+        mailer.messages().send({
+          to: mentor.email,
+          from: mail.FROM,
+          subject: mail.invite.subject,
+          text: mail.invite.text(mailData),
+          html: mail.invite.html(mailData),
+        }, (error, body) => {
+          if (error) {
+            console.warn(error)
+          }
+        })
+          return {
+            id: mentor.id,
+            mentorExists: false,
+            message: 'Invite Sent',
+            email: mentor.email,
+          }
+        })
+    } else {
+      // Enrol Existing Student
+        return {
+          id: mentor.id,
+          mentorExists: true,
+          message: 'Student Enrolled',
+          email: mentor.email,
+        }
+    }
+  })
+}

@@ -7,6 +7,8 @@ import Activity from './Activity'
 import Business from './Business'
 import BusinessStudent from './BusinessStudent'
 import Notification from './Notification'
+import Mentor from './Mentor'
+import MentorStudent from './MentorStudent'
 
 @Scopes({
   public: {
@@ -39,6 +41,15 @@ export class Student extends Model<Student> {
   })
   businesses: Business[]
 
+
+  @BelongsToMany(() => Mentor, {
+    through: {
+      model: () => MentorStudent,
+      unique: false,
+    },
+  })
+  mentors: Mentor[]
+
   @HasMany(() => Notification)
   notifications: Notification[]
 
@@ -50,6 +61,11 @@ export class Student extends Model<Student> {
   addToCourse(courseId) {
     const studentId = this.id
     return CourseStudent.findOrCreate({ where: { courseId, studentId }})
+  }
+
+  addToMentor(mentorId) {
+    const studentId = this.id
+    return MentorStudent.findOrCreate({ where: { mentorId, studentId }})
   }
 }
 

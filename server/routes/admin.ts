@@ -1,8 +1,8 @@
-import { createCourse, inviteStudent } from '../actions'
+import { createCourse, inviteStudent, inviteMentor } from '../actions'
 import app from '../app'
 import { checkAdminLogin, checkAdminPermission, mockAdminLogin } from '../authentication'
 import { Logger } from '../logger'
-import { Admin, Business, BusinessCourse, Card, Course, CourseStudent, Student, Unit, BusinessStudent, Activity, Notification, File } from '../models'
+import { Admin, Business, BusinessCourse, Card, Course, CourseStudent, Student, Mentor, MentorStudent, Unit, BusinessStudent, Activity, Notification, File } from '../models'
 import { getSignedUrl, createPresignedPost, s3 } from '../s3'
 import { S3_BUCKET, UPLOAD_DIRECTORY, STRIPE_SECRET, PUSHER  } from '../constants'
 import { get } from 'lodash'
@@ -795,5 +795,36 @@ app.post('/admin/student/activity', (req, res) => {
     adminId: req.user.admin.id,
   }).then(activity => {
     res.send(activity)
+  })
+})
+
+
+
+// Mentors
+
+app.post('/admin/mentor', (req, res) => {
+  const { email, first_name, last_name } = req.body
+  Admin.findByPk(req.user.admin.id, { include: [Student] }).then(admin => {
+    const ids = admin.businesses.map(d => d.id)
+    
+    inviteMentor({ email, first_name, last_name }, admin.name).then(result => {
+      res.send(result)
+    }).catch(err => {
+      Logger.warn(err)
+      res.status(500).send({ message: 'Could not invite Student' })
+    })
+  })
+})
+
+
+
+app.get('/admin/mentor/:mentorId', checkAdminPermission, (req, res) => {
+  const adminId = req.user.admin.id
+  Mentor.findByPk(req.params.mentorId, {
+    include: [
+      { model: Mentor, where: { adminId }, required: false },
+    ]
+  }).then(mentor => {
+    res.send(mentor)
   })
 })

@@ -25,7 +25,7 @@ app.engine('handlebars', hbs.engine)
 
 // Middleware
 import { cors } from './middleware'
-import { checkAdminLogin, checkStudentLogin } from './authentication'
+import { checkAdminLogin, checkStudentLogin, checkMentorLogin } from './authentication'
 import { Logger } from './logger'
 const staticRoute = express.static(path.resolve('./dist'))
 app.use('/', httpsRedirect())
